@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+/* ————————————————————————————————————————————————
+   Design tokens — Mateo & Julieth
+   ———————————————————————————————————————————————— */
+@theme {
+  /* Palette */
+  --color-cream: #f7f3ee;
+  --color-shell: #f1eadf;
+  --color-sand: #ddd2c4;
+  --color-gold: #c6a97a;
+  --color-gold-deep: #a98a58;
+  --color-bronze: #8a6b3f; /* accessible gold for small text on light bg */
+  --color-ink: #1b1b1b;
+  --color-ink-2: #22201c;
+  --color-clay: #9d4b3c; /* form errors */
+
+  /* Typography */
+  --font-serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
+
+  /* Motion curves */
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-soft: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-curtain: cubic-bezier(0.76, 0, 0.24, 1);
+
+  /* Ambient animations */
+  --animate-drift: drift 26s ease-in-out infinite alternate;
+  --animate-drift-slow: drift 38s ease-in-out infinite alternate;
+  --animate-float: floaty 8s ease-in-out infinite alternate;
+  --animate-spin-slow: spin 30s linear infinite;
+  --animate-scroll-hint: scroll-hint 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+
+  @keyframes drift {
+    from {
+      transform: translate3d(-3%, -2%, 0) scale(1);
+    }
+    to {
+      transform: translate3d(4%, 3%, 0) scale(1.15);
+    }
+  }
+  @keyframes floaty {
+    from {
+      transform: translateY(0px);
+    }
+    to {
+      transform: translateY(-26px);
+    }
+  }
+  @keyframes scroll-hint {
+    0% {
+      transform: translateY(-110%);
+    }
+    55%,
+    100% {
+      transform: translateY(110%);
+    }
+  }
+}
+
+/* ————————————————————————————————————————————————
+   Base
+   ———————————————————————————————————————————————— */
+@layer base {
+  html {
+    scroll-behavior: auto; /* Lenis drives scrolling */
+  }
+
+  body {
+    @apply bg-cream font-sans text-ink antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "liga" 1, "kern" 1;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-gold) 38%, transparent);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px var(--color-cream) inset;
+    -webkit-text-fill-color: var(--color-ink);
+    transition: background-color 9999s ease-in-out 0s;
+  }
+
+  /* Subtle scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-cream);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-sand);
+    border-radius: 8px;
+    border: 3px solid var(--color-cream);
+  }
+}
+
+/* ————————————————————————————————————————————————
+   Utilities
+   ———————————————————————————————————————————————— */
+@layer utilities {
+  /* Film grain texture (SVG turbulence, tiled) */
+  .grain-overlay {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    background-size: 220px 220px;
+  }
+}
+
+/* ————————————————————————————————————————————————
+   Lenis smooth scroll
+   ———————————————————————————————————————————————— */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ————————————————————————————————————————————————
+   Reduced motion — kill ambient CSS animation
+   ———————————————————————————————————————————————— */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

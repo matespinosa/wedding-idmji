@@ -1,0 +1,26 @@
+import { Closing } from "@/components/sections/Closing";
+import { DressCode } from "@/components/sections/DressCode";
+import { Footer } from "@/components/sections/Footer";
+import { Hero } from "@/components/sections/Hero";
+import { Rsvp } from "@/components/sections/Rsvp";
+import { Story } from "@/components/sections/Story";
+import { Venues } from "@/components/sections/Venues";
+import { SectionDivider } from "@/components/ui/SectionDivider";
+
+export default function Home() {
+  return (
+    <main>
+      <Hero />
+      <Story />
+      <SectionDivider bg="bg-cream" fill="text-shell" />
+      <Venues />
+      <SectionDivider bg="bg-shell" fill="text-ink" flip={false} />
+      <DressCode />
+      <SectionDivider bg="bg-ink" fill="text-cream" />
+      <Rsvp />
+      <SectionDivider bg="bg-cream" fill="text-ink" />
+      <Closing />
+      <Footer />
+    </main>
+  );
+}
