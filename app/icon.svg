@@ -1,4 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Mateo y Julieth">
   <rect width="64" height="64" rx="14" fill="#1B1B1B"/>
-  <text x="32" y="42" font-family="Georgia, 'Times New Roman', serif" font-size="24" font-style="italic" fill="#C6A97A" text-anchor="middle">M&amp;J</text>
+  <rect x="3" y="3" width="58" height="58" rx="12" fill="none" stroke="#C6A97A" stroke-opacity="0.45" stroke-width="1"/>
+  <text x="32" y="42" text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif" font-size="22" font-style="italic"
+    fill="#C6A97A">M&amp;J</text>
 </svg>

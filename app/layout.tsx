@@ -24,13 +24,34 @@ export const metadata: Metadata = {
   description:
     "Acompáñanos en nuestra ceremonia religiosa el sábado 3 de octubre de 2026 en la Iglesia de Dios Ministerial de Jesucristo Internacional, sede La Colina, Bogotá.",
   keywords: ["ceremonia religiosa", "Mateo y Julieth", "invitación", "matrimonio", "Bogotá"],
+  applicationName: "Mateo & Julieth",
   openGraph: {
     title: "Mateo & Julieth — Ceremonia religiosa",
     description:
       "Acompáñanos en nuestra ceremonia religiosa · Sábado 3 de octubre de 2026 · 11:00 a. m. · Bogotá.",
     type: "website",
     locale: "es_CO",
-    images: [{ url: "/images/social-thumbnail.jpg", width: 1200, height: 630 }],
+    siteName: "Mateo & Julieth",
+    images: [
+      {
+        url: "/images/social-thumbnail.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Mateo & Julieth — Ceremonia religiosa · 3 de octubre de 2026 · Bogotá",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Mateo & Julieth — Ceremonia religiosa",
+    description:
+      "Acompáñanos en nuestra ceremonia religiosa · Sábado 3 de octubre de 2026 · 11:00 a. m. · Bogotá.",
+    images: [
+      {
+        url: "/images/social-thumbnail.jpg",
+        alt: "Mateo & Julieth — Ceremonia religiosa · 3 de octubre de 2026 · Bogotá",
+      },
+    ],
   },
 };
 
