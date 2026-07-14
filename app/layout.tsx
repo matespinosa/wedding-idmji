@@ -20,14 +20,14 @@ const inter = Inter({
 export const metadata: Metadata = {
   // TODO: cambia esto por el dominio real cuando se publique.
   metadataBase: new URL("https://mateo-julieth.vercel.app"),
-  title: "Mateo & Julieth — Nuestra boda · 03.10.2026",
+  title: "Mateo & Julieth — Ceremonia religiosa · 03.10.2026",
   description:
-    "En el tiempo perfecto de Dios, nuestros caminos se unieron para siempre. Acompáñanos a celebrar nuestra boda el sábado 3 de octubre de 2026 en Bogotá.",
-  keywords: ["boda", "Mateo y Julieth", "invitación", "matrimonio", "Bogotá"],
+    "Acompáñanos en nuestra ceremonia religiosa el sábado 3 de octubre de 2026 en la Iglesia de Dios Ministerial de Jesucristo Internacional, sede La Colina, Bogotá.",
+  keywords: ["ceremonia religiosa", "Mateo y Julieth", "invitación", "matrimonio", "Bogotá"],
   openGraph: {
-    title: "Mateo & Julieth — Nuestra boda",
+    title: "Mateo & Julieth — Ceremonia religiosa",
     description:
-      "Acompáñanos a celebrar nuestra boda · Sábado 3 de octubre de 2026 · Bogotá.",
+      "Acompáñanos en nuestra ceremonia religiosa · Sábado 3 de octubre de 2026 · 11:00 a. m. · Bogotá.",
     type: "website",
     locale: "es_CO",
     images: [{ url: "/images/social-thumbnail.jpg", width: 1200, height: 630 }],

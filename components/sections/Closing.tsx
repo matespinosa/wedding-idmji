@@ -25,17 +25,20 @@ export function Closing() {
   return (
     <section
       id="gracias"
+      data-closing-section
       className="relative overflow-hidden bg-ink py-32 text-cream md:py-44"
     >
       {/* Foto real de fondo con velo oscuro */}
-      <div aria-hidden className="absolute inset-0">
-        <Image
-          src={site.closing.image}
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover object-center opacity-40"
-        />
+      <div aria-hidden className="absolute inset-0 overflow-hidden">
+        <div data-closing-parallax className="absolute inset-[-8%]">
+          <Image
+            src={site.closing.image}
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover object-center opacity-40"
+          />
+        </div>
       </div>
       <div
         aria-hidden
@@ -69,7 +72,7 @@ export function Closing() {
         ))}
       </div>
 
-      <div className="relative mx-auto flex max-w-4xl flex-col items-center px-6 text-center">
+      <div data-closing-content className="relative mx-auto flex max-w-4xl flex-col items-center px-6 text-center">
         <Reveal blur={false} y={16}>
           <p className="font-serif text-base italic text-cream/50 md:text-lg">
             {site.closing.verse}

@@ -134,7 +134,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
                 transition={{ duration: 0.9, ease: EASE_OUT, delay: 1.15 }}
                 className="mt-6 text-[10px] uppercase tracking-[0.45em] text-cream/50"
               >
-                Nuestra boda · {site.date.short}
+                Ceremonia religiosa · {site.date.short}
               </motion.p>
             </>
           )}

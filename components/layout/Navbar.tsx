@@ -118,21 +118,6 @@ export function Navbar() {
                 </li>
               );
             })}
-            <li>
-              <a
-                href="#rsvp"
-                onClick={(e) => go(e, "#rsvp")}
-                className="group relative inline-flex items-center overflow-hidden rounded-full border border-ink/20 px-5 py-2.5 text-[10px] uppercase tracking-[0.22em] text-ink transition-colors duration-500 hover:border-ink"
-              >
-                <span
-                  aria-hidden
-                  className="absolute inset-0 origin-bottom scale-y-0 bg-ink transition-transform duration-500 ease-out-expo group-hover:scale-y-100"
-                />
-                <span className="relative z-10 transition-colors duration-500 group-hover:text-cream">
-                  Confirmar
-                </span>
-              </a>
-            </li>
           </ul>
 
           {/* Hamburguesa */}

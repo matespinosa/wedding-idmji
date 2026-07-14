@@ -1,6 +1,7 @@
 "use client";
 
 import Lenis from "lenis";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   createContext,
   useCallback,
@@ -38,6 +39,9 @@ export function LenisProvider({ children }: { children: ReactNode }) {
     });
     lenisRef.current = lenis;
 
+    const syncScrollTrigger = () => ScrollTrigger.update();
+    lenis.on("scroll", syncScrollTrigger);
+
     let raf = 0;
     const loop = (time: number) => {
       lenis.raf(time);
@@ -47,6 +51,7 @@ export function LenisProvider({ children }: { children: ReactNode }) {
 
     return () => {
       cancelAnimationFrame(raf);
+      lenis.off("scroll", syncScrollTrigger);
       lenis.destroy();
       lenisRef.current = null;
     };
