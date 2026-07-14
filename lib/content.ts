@@ -52,7 +52,7 @@ export const site = {
     moments: [
       {
         title: "Dios cruzó nuestros caminos",
-        text: "Hace casi cuatro años y medio nos conocimos. Entre conversaciones, confianza y apoyo, Dios empezó a escribir nuestra historia.",
+        text: "Hace 4 años y medio… nos conocimos. Entre conversaciones, confianza y apoyo, Dios empezó a escribir nuestra historia.",
         word: "Encuentro",
       },
       {
