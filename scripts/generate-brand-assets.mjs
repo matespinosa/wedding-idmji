@@ -1,6 +1,10 @@
 /**
  * Genera el thumbnail de compartir (OG 1200×630) y los íconos de la página.
+ *
+ * Estilo del cover: foto de la pareja a la izquierda + panel de invitación a la derecha.
+ *
  * Uso: node scripts/generate-brand-assets.mjs
+ * Foto: cambia PHOTO abajo si quieres otra (cierre.jpg, hero.jpg, other.jpg, etc.)
  */
 import { writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -8,31 +12,62 @@ import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const photo = join(root, "public/images/cierre.jpg");
+
+/** Foto de los dos que aparece en el cover al compartir el link. */
+const PHOTO = "cierre.jpg";
+const photoPath = join(root, "public/images", PHOTO);
 
 const W = 1200;
 const H = 630;
+const PHOTO_W = 700; // ~58% foto, ~42% panel
 
-const overlay = Buffer.from(`<?xml version="1.0" encoding="UTF-8"?>
+const panel = Buffer.from(`<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="veil" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#1b1b1b" stop-opacity="0.12"/>
-      <stop offset="42%" stop-color="#1b1b1b" stop-opacity="0.28"/>
-      <stop offset="100%" stop-color="#1b1b1b" stop-opacity="0.78"/>
+    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1b1b1b" stop-opacity="0"/>
+      <stop offset="78%" stop-color="#1b1b1b" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#1b1b1b" stop-opacity="0.35"/>
     </linearGradient>
   </defs>
-  <rect width="${W}" height="${H}" fill="url(#veil)"/>
-  <line x1="520" y1="458" x2="680" y2="458" stroke="#c6a97a" stroke-width="1.5" stroke-opacity="0.85"/>
-  <text x="600" y="392" text-anchor="middle"
-    font-family="Georgia, 'Times New Roman', serif" font-size="22" letter-spacing="8"
-    fill="#f7f3ee" fill-opacity="0.88">CEREMONIA RELIGIOSA</text>
-  <text x="600" y="470" text-anchor="middle"
-    font-family="Georgia, 'Times New Roman', serif" font-size="78" font-style="italic"
-    fill="#f7f3ee">Mateo &amp; Julieth</text>
-  <text x="600" y="528" text-anchor="middle"
-    font-family="Georgia, 'Times New Roman', serif" font-size="24" letter-spacing="6"
-    fill="#c6a97a">03 · 10 · 2026 · BOGOTÁ</text>
+
+  <!-- Sombra suave entre foto y panel -->
+  <rect x="0" y="0" width="${PHOTO_W}" height="${H}" fill="url(#fade)"/>
+
+  <!-- Panel de invitación -->
+  <rect x="${PHOTO_W}" y="0" width="${W - PHOTO_W}" height="${H}" fill="#f7f3ee"/>
+  <rect x="${PHOTO_W + 28}" y="28" width="${W - PHOTO_W - 56}" height="${H - 56}"
+    fill="none" stroke="#c6a97a" stroke-opacity="0.55" stroke-width="1.25"/>
+
+  <text x="${PHOTO_W + (W - PHOTO_W) / 2}" y="170" text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif" font-size="15" letter-spacing="5.5"
+    fill="#8a6b3f">INVITACIÓN</text>
+
+  <line x1="${PHOTO_W + 110}" y1="198" x2="${W - 110}" y2="198"
+    stroke="#c6a97a" stroke-width="1" stroke-opacity="0.7"/>
+
+  <text x="${PHOTO_W + (W - PHOTO_W) / 2}" y="268" text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif" font-size="44" font-style="italic"
+    fill="#1b1b1b">Mateo</text>
+  <text x="${PHOTO_W + (W - PHOTO_W) / 2}" y="318" text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif" font-size="22" font-style="italic"
+    fill="#c6a97a">&amp;</text>
+  <text x="${PHOTO_W + (W - PHOTO_W) / 2}" y="372" text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif" font-size="44" font-style="italic"
+    fill="#1b1b1b">Julieth</text>
+
+  <line x1="${PHOTO_W + 110}" y1="404" x2="${W - 110}" y2="404"
+    stroke="#c6a97a" stroke-width="1" stroke-opacity="0.7"/>
+
+  <text x="${PHOTO_W + (W - PHOTO_W) / 2}" y="456" text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif" font-size="16" letter-spacing="2.5"
+    fill="#22201c">Ceremonia religiosa</text>
+  <text x="${PHOTO_W + (W - PHOTO_W) / 2}" y="492" text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif" font-size="18" letter-spacing="3"
+    fill="#8a6b3f">03 · 10 · 2026</text>
+  <text x="${PHOTO_W + (W - PHOTO_W) / 2}" y="528" text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif" font-size="15" letter-spacing="2"
+    fill="#22201c" fill-opacity="0.72">Bogotá</text>
 </svg>`);
 
 const iconSvg = `<?xml version="1.0" encoding="UTF-8"?>
@@ -53,11 +88,32 @@ const appleSvg = `<?xml version="1.0" encoding="UTF-8"?>
     fill="#C6A97A">M&amp;J</text>
 </svg>`;
 
-await sharp(photo)
+const couplePhoto = await sharp(photoPath)
   .rotate()
-  .resize(W, H, { fit: "cover", position: "centre" })
-  .composite([{ input: overlay, blend: "over" }])
-  .jpeg({ quality: 88, mozjpeg: true })
+  .resize(PHOTO_W, H, {
+    fit: "cover",
+    // Enfoca rostros / torso (arriba-centro) en fotos verticales
+    position: "north",
+  })
+  .toBuffer();
+
+const canvas = await sharp({
+  create: {
+    width: W,
+    height: H,
+    channels: 3,
+    background: { r: 247, g: 243, b: 238 },
+  },
+})
+  .jpeg()
+  .toBuffer();
+
+await sharp(canvas)
+  .composite([
+    { input: couplePhoto, left: 0, top: 0 },
+    { input: panel, blend: "over" },
+  ])
+  .jpeg({ quality: 90, mozjpeg: true })
   .toFile(join(root, "public/images/social-thumbnail.jpg"));
 
 writeFileSync(join(root, "app/icon.svg"), iconSvg);
@@ -66,7 +122,7 @@ await sharp(Buffer.from(appleSvg))
   .png()
   .toFile(join(root, "app/apple-icon.png"));
 
-console.log("Generated:");
+console.log("Generated cover with photo:", PHOTO);
 console.log("  public/images/social-thumbnail.jpg");
 console.log("  app/icon.svg");
 console.log("  app/apple-icon.png");
