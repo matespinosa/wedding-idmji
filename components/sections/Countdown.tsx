@@ -1,32 +1,26 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { RingsOrnament } from "@/components/ui/Florals";
 import { Reveal } from "@/components/ui/Reveal";
 import { TextReveal } from "@/components/ui/TextReveal";
 import { site, WEDDING_DATE } from "@/lib/content";
 import { useCountdown } from "@/lib/hooks";
-import { EASE_OUT } from "@/lib/motion";
 
 function Unit({ value, label }: { value: number; label: string }) {
   const padded = String(value).padStart(2, "0");
   return (
     <div className="flex flex-col items-center">
-      <div className="relative h-[1.1em] overflow-hidden font-serif text-[clamp(2.8rem,9vw,5.5rem)] font-light leading-none text-ink tabular-nums">
-        {/* espaciador invisible: fija el ancho para que no salte */}
-        <span className="invisible">{padded}</span>
-        <AnimatePresence mode="popLayout" initial={false}>
-          <motion.span
-            key={padded}
-            initial={{ y: "60%", opacity: 0 }}
-            animate={{ y: "0%", opacity: 1 }}
-            exit={{ y: "-60%", opacity: 0 }}
-            transition={{ duration: 0.6, ease: EASE_OUT }}
-            className="absolute inset-0 flex items-center justify-center will-change-transform"
-          >
-            {padded}
-          </motion.span>
-        </AnimatePresence>
+      <div className="font-serif text-[clamp(2.8rem,9vw,5.5rem)] font-light leading-none text-ink tabular-nums">
+        <motion.span
+          key={padded}
+          initial={{ opacity: 0.4 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="inline-block min-w-[2ch] text-center"
+        >
+          {padded}
+        </motion.span>
       </div>
       <span className="mt-3 text-[10px] uppercase tracking-[0.3em] text-bronze">
         {label}
@@ -90,9 +84,9 @@ export function Countdown() {
             </div>
           ) : left?.passed ? (
             <motion.p
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.9, ease: EASE_OUT }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.35, ease: "easeOut" }}
               className="font-serif text-[clamp(2.4rem,7vw,4rem)] font-light italic text-gold-deep"
             >
               {site.countdown.today}
