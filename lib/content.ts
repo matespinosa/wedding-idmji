@@ -210,7 +210,10 @@ export const site = {
       label: "Mujeres",
       garment: "Vestido formal",
     },
-    note: "El blanco está reservado para la novia.",
+    notes: [
+      "El blanco está reservado para la novia.",
+      "El verde estará reservado para la corte.",
+    ],
   },
 
   closing: {

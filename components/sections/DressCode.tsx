@@ -144,11 +144,18 @@ export function DressCode() {
         </div>
 
         <Reveal delay={0.2} y={18}>
-          <p className="mx-auto mt-20 flex max-w-lg items-center justify-center gap-4 text-center font-serif text-xl italic text-cream/75 md:text-2xl">
-            <span aria-hidden className="h-px w-8 shrink-0 bg-gold/40" />
-            {site.dresscode.note}
-            <span aria-hidden className="h-px w-8 shrink-0 bg-gold/40" />
-          </p>
+          <div className="mx-auto mt-20 flex max-w-lg flex-col items-center gap-4 text-center">
+            {site.dresscode.notes.map((note) => (
+              <p
+                key={note}
+                className="flex items-center justify-center gap-4 font-serif text-xl italic text-cream/75 md:text-2xl"
+              >
+                <span aria-hidden className="h-px w-8 shrink-0 bg-gold/40" />
+                {note}
+                <span aria-hidden className="h-px w-8 shrink-0 bg-gold/40" />
+              </p>
+            ))}
+          </div>
         </Reveal>
       </div>
     </section>
