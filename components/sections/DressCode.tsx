@@ -117,17 +117,14 @@ export function DressCode() {
   return (
     <section
       id="dress-code"
-      className="relative overflow-hidden bg-ink pt-28 pb-32 text-cream md:py-36"
+      className="relative bg-ink pt-28 pb-32 text-cream md:py-36"
     >
-      {/* Viñeta ambiental dorada. El centro va a un 32% del alto (no al
-          8%) para que la mancha se apague del todo antes de tocar el
-          borde superior: si toca el borde, se corta en una línea recta
-          justo donde termina la onda del divisor, y esa costura recta
-          es lo que se leía como "cortado". Así el brillo nace ya
-          dentro de la sección, disolviéndose en el ink que trae la onda. */}
+      {/* La viñeta no toca el borde superior: si llega hasta ahí, overflow
+          o el antialiasing del divisor la cortan en una línea clara.
+          Nace más abajo y se disuelve en el ink. */}
       <div
         aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(60%_42%_at_50%_32%,rgba(198,169,122,0.14),transparent_65%)]"
+        className="pointer-events-none absolute inset-x-0 top-[18%] bottom-[12%] bg-[radial-gradient(58%_48%_at_50%_40%,rgba(198,169,122,0.14),transparent_68%)]"
       />
 
       <div className="relative mx-auto max-w-5xl px-5 md:px-8">
@@ -144,18 +141,11 @@ export function DressCode() {
         </div>
 
         <Reveal delay={0.2} y={18}>
-          <div className="mx-auto mt-20 flex max-w-lg flex-col items-center gap-4 text-center">
-            {site.dresscode.notes.map((note) => (
-              <p
-                key={note}
-                className="flex items-center justify-center gap-4 font-serif text-xl italic text-cream/75 md:text-2xl"
-              >
-                <span aria-hidden className="h-px w-8 shrink-0 bg-gold/40" />
-                {note}
-                <span aria-hidden className="h-px w-8 shrink-0 bg-gold/40" />
-              </p>
-            ))}
-          </div>
+          <p className="mx-auto mt-20 flex max-w-xl items-center justify-center gap-4 text-center font-serif text-xl italic text-cream/75 md:text-2xl">
+            <span aria-hidden className="h-px w-8 shrink-0 bg-gold/40" />
+            {site.dresscode.note}
+            <span aria-hidden className="h-px w-8 shrink-0 bg-gold/40" />
+          </p>
         </Reveal>
       </div>
     </section>

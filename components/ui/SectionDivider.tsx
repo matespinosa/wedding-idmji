@@ -12,7 +12,16 @@ type Props = {
 /** Soft asymmetric wave between sections — no hard cuts. */
 export function SectionDivider({ bg, fill, flip = false, className }: Props) {
   return (
-    <div aria-hidden className={cn("relative -mb-px", bg, className)}>
+    <div
+      aria-hidden
+      className={cn(
+        // -mb-px cierra el pelo de anti-aliasing entre la onda y la
+        // sección siguiente (si no, el cream del body asoma como línea).
+        "relative -mb-px leading-[0]",
+        bg,
+        className,
+      )}
+    >
       <svg
         viewBox="0 0 1440 120"
         preserveAspectRatio="none"
