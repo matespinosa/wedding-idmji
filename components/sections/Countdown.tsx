@@ -1,28 +1,43 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { RingsOrnament } from "@/components/ui/Florals";
 import { Reveal } from "@/components/ui/Reveal";
 import { TextReveal } from "@/components/ui/TextReveal";
 import { site, WEDDING_DATE } from "@/lib/content";
 import { useCountdown } from "@/lib/hooks";
+import { EASE_OUT } from "@/lib/motion";
+import { cn } from "@/lib/utils";
 
 function Unit({ value, label }: { value: number; label: string }) {
   const padded = String(value).padStart(2, "0");
+  const [display, setDisplay] = useState(padded);
+  const [dimmed, setDimmed] = useState(false);
+
+  useEffect(() => {
+    if (padded === display) return;
+    setDimmed(true);
+    const id = window.setTimeout(() => {
+      setDisplay(padded);
+      setDimmed(false);
+    }, 120);
+    return () => window.clearTimeout(id);
+  }, [padded, display]);
+
   return (
     <div className="flex flex-col items-center">
       <div className="font-serif text-[clamp(2.8rem,9vw,5.5rem)] font-light leading-none text-ink tabular-nums">
-        <motion.span
-          key={padded}
-          initial={{ opacity: 0.4 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          className="inline-block min-w-[2ch] text-center"
+        <span
+          className={cn(
+            "inline-block transition-opacity duration-200 ease-out",
+            dimmed ? "opacity-35" : "opacity-100",
+          )}
         >
-          {padded}
-        </motion.span>
+          {display}
+        </span>
       </div>
-      <span className="mt-3 text-[10px] uppercase tracking-[0.3em] text-bronze">
+      <span className="mt-3 text-[12px] uppercase tracking-[0.26em] text-bronze">
         {label}
       </span>
     </div>
@@ -42,7 +57,7 @@ export function Countdown() {
 
       <div className="relative mx-auto max-w-4xl px-5 text-center md:px-8">
         <Reveal blur={false} y={16}>
-          <p className="flex items-center justify-center gap-4 text-[11px] font-medium uppercase tracking-[0.38em] text-bronze">
+          <p className="flex items-center justify-center gap-4 text-[12px] font-medium uppercase tracking-[0.34em] text-bronze">
             <span aria-hidden className="h-px w-10 bg-gold/70" />
             {site.countdown.eyebrow}
             <span aria-hidden className="h-px w-10 bg-gold/70" />
@@ -84,9 +99,9 @@ export function Countdown() {
             </div>
           ) : left?.passed ? (
             <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.35, ease: "easeOut" }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.9, ease: EASE_OUT }}
               className="font-serif text-[clamp(2.4rem,7vw,4rem)] font-light italic text-gold-deep"
             >
               {site.countdown.today}
@@ -98,7 +113,7 @@ export function Countdown() {
         </div>
 
         <Reveal delay={0.15}>
-          <p className="mt-10 text-[11px] uppercase tracking-[0.34em] text-ink/45">
+          <p className="mt-10 text-[13px] uppercase tracking-[0.3em] text-ink/55">
             {site.countdown.subtitle}
           </p>
         </Reveal>

@@ -1,128 +1,133 @@
 /**
- * Genera el thumbnail de compartir (OG 1200×630) y los íconos de la página.
- *
- * Estilo del cover: foto de la pareja a la izquierda + panel de invitación a la derecha.
+ * Genera el thumbnail de compartir (OG 1200×630) y favicons con foto de la pareja.
  *
  * Uso: node scripts/generate-brand-assets.mjs
- * Foto: cambia PHOTO abajo si quieres otra (cierre.jpg, hero.jpg, other.jpg, etc.)
+ * Foto: cambia PHOTO abajo si quieres otra (cierre.jpg, hero.jpg, etc.)
  */
-import { writeFileSync } from "node:fs";
+import { unlinkSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-/** Foto de los dos que aparece en el cover al compartir el link. */
+/** Foto de los dos para cover y favicon. */
 const PHOTO = "cierre.jpg";
 const photoPath = join(root, "public/images", PHOTO);
 
 const W = 1200;
 const H = 630;
-const PHOTO_W = 700; // ~58% foto, ~42% panel
 
-const panel = Buffer.from(`<?xml version="1.0" encoding="UTF-8"?>
+const overlay = Buffer.from(`<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#1b1b1b" stop-opacity="0"/>
-      <stop offset="78%" stop-color="#1b1b1b" stop-opacity="0.18"/>
-      <stop offset="100%" stop-color="#1b1b1b" stop-opacity="0.35"/>
+    <linearGradient id="veil" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1b1b1b" stop-opacity="0.05"/>
+      <stop offset="45%" stop-color="#1b1b1b" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#1b1b1b" stop-opacity="0.72"/>
     </linearGradient>
   </defs>
-
-  <!-- Sombra suave entre foto y panel -->
-  <rect x="0" y="0" width="${PHOTO_W}" height="${H}" fill="url(#fade)"/>
-
-  <!-- Panel de invitación -->
-  <rect x="${PHOTO_W}" y="0" width="${W - PHOTO_W}" height="${H}" fill="#f7f3ee"/>
-  <rect x="${PHOTO_W + 28}" y="28" width="${W - PHOTO_W - 56}" height="${H - 56}"
-    fill="none" stroke="#c6a97a" stroke-opacity="0.55" stroke-width="1.25"/>
-
-  <text x="${PHOTO_W + (W - PHOTO_W) / 2}" y="170" text-anchor="middle"
-    font-family="Georgia, 'Times New Roman', serif" font-size="15" letter-spacing="5.5"
-    fill="#8a6b3f">INVITACIÓN</text>
-
-  <line x1="${PHOTO_W + 110}" y1="198" x2="${W - 110}" y2="198"
-    stroke="#c6a97a" stroke-width="1" stroke-opacity="0.7"/>
-
-  <text x="${PHOTO_W + (W - PHOTO_W) / 2}" y="268" text-anchor="middle"
-    font-family="Georgia, 'Times New Roman', serif" font-size="44" font-style="italic"
-    fill="#1b1b1b">Mateo</text>
-  <text x="${PHOTO_W + (W - PHOTO_W) / 2}" y="318" text-anchor="middle"
-    font-family="Georgia, 'Times New Roman', serif" font-size="22" font-style="italic"
-    fill="#c6a97a">&amp;</text>
-  <text x="${PHOTO_W + (W - PHOTO_W) / 2}" y="372" text-anchor="middle"
-    font-family="Georgia, 'Times New Roman', serif" font-size="44" font-style="italic"
-    fill="#1b1b1b">Julieth</text>
-
-  <line x1="${PHOTO_W + 110}" y1="404" x2="${W - 110}" y2="404"
-    stroke="#c6a97a" stroke-width="1" stroke-opacity="0.7"/>
-
-  <text x="${PHOTO_W + (W - PHOTO_W) / 2}" y="456" text-anchor="middle"
-    font-family="Georgia, 'Times New Roman', serif" font-size="16" letter-spacing="2.5"
-    fill="#22201c">Ceremonia religiosa</text>
-  <text x="${PHOTO_W + (W - PHOTO_W) / 2}" y="492" text-anchor="middle"
-    font-family="Georgia, 'Times New Roman', serif" font-size="18" letter-spacing="3"
-    fill="#8a6b3f">03 · 10 · 2026</text>
-  <text x="${PHOTO_W + (W - PHOTO_W) / 2}" y="528" text-anchor="middle"
-    font-family="Georgia, 'Times New Roman', serif" font-size="15" letter-spacing="2"
-    fill="#22201c" fill-opacity="0.72">Bogotá</text>
+  <rect width="${W}" height="${H}" fill="url(#veil)"/>
+  <text x="600" y="470" text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif" font-size="18" letter-spacing="7"
+    fill="#f7f3ee" fill-opacity="0.9">CEREMONIA RELIGIOSA</text>
+  <text x="600" y="535" text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif" font-size="64" font-style="italic"
+    fill="#f7f3ee">Mateo &amp; Julieth</text>
+  <text x="600" y="580" text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif" font-size="20" letter-spacing="5"
+    fill="#c6a97a">03 · 10 · 2026 · BOGOTÁ</text>
 </svg>`);
 
-const iconSvg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Mateo y Julieth">
-  <rect width="64" height="64" rx="14" fill="#1B1B1B"/>
-  <rect x="3" y="3" width="58" height="58" rx="12" fill="none" stroke="#C6A97A" stroke-opacity="0.45" stroke-width="1"/>
-  <text x="32" y="42" text-anchor="middle"
-    font-family="Georgia, 'Times New Roman', serif" font-size="22" font-style="italic"
-    fill="#C6A97A">M&amp;J</text>
-</svg>`;
+const ring = (size) =>
+  Buffer.from(`<?xml version="1.0" encoding="UTF-8"?>
+<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
+  <rect x="2" y="2" width="${size - 4}" height="${size - 4}" rx="${Math.round(size * 0.18)}"
+    fill="none" stroke="#C6A97A" stroke-width="${Math.max(2, size * 0.03)}" stroke-opacity="0.85"/>
+</svg>`);
 
-const appleSvg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 64 64">
-  <rect width="64" height="64" fill="#1B1B1B"/>
-  <rect x="4" y="4" width="56" height="56" rx="10" fill="none" stroke="#C6A97A" stroke-opacity="0.5" stroke-width="1.25"/>
-  <text x="32" y="42" text-anchor="middle"
-    font-family="Georgia, 'Times New Roman', serif" font-size="22" font-style="italic"
-    fill="#C6A97A">M&amp;J</text>
-</svg>`;
+async function makeOg() {
+  const outPublic = join(root, "public/images/social-thumbnail.jpg");
+  const outOg = join(root, "app/opengraph-image.jpg");
+  const outTw = join(root, "app/twitter-image.jpg");
 
-const couplePhoto = await sharp(photoPath)
-  .rotate()
-  .resize(PHOTO_W, H, {
-    fit: "cover",
-    // Enfoca rostros / torso (arriba-centro) en fotos verticales
-    position: "north",
-  })
-  .toBuffer();
+  const buffer = await sharp(photoPath)
+    .rotate()
+    .resize(W, H, { fit: "cover", position: "attention" })
+    .composite([{ input: overlay, blend: "over" }])
+    .jpeg({ quality: 90, mozjpeg: true })
+    .toBuffer();
 
-const canvas = await sharp({
-  create: {
-    width: W,
-    height: H,
-    channels: 3,
-    background: { r: 247, g: 243, b: 238 },
-  },
-})
-  .jpeg()
-  .toBuffer();
+  await sharp(buffer).toFile(outPublic);
+  await sharp(buffer).toFile(outOg);
+  await sharp(buffer).toFile(outTw);
+}
 
-await sharp(canvas)
-  .composite([
-    { input: couplePhoto, left: 0, top: 0 },
-    { input: panel, blend: "over" },
-  ])
-  .jpeg({ quality: 90, mozjpeg: true })
-  .toFile(join(root, "public/images/social-thumbnail.jpg"));
+async function makeFavicons() {
+  // Recorte cercano a los rostros (parte superior de cierre.jpg).
+  const meta = await sharp(photoPath).rotate().metadata();
+  const srcW = meta.width ?? 1704;
+  const srcH = meta.height ?? 1800;
+  const side = Math.round(Math.min(srcW, srcH) * 0.55);
+  const left = Math.round((srcW - side) / 2);
+  const top = Math.round(srcH * 0.06);
 
-writeFileSync(join(root, "app/icon.svg"), iconSvg);
+  const face = await sharp(photoPath)
+    .rotate()
+    .extract({
+      left: Math.max(0, left),
+      top: Math.max(0, top),
+      width: Math.min(side, srcW - left),
+      height: Math.min(side, srcH - top),
+    })
+    .resize(640, 640, { fit: "cover", position: "centre" })
+    .jpeg({ quality: 92 })
+    .toBuffer();
 
-await sharp(Buffer.from(appleSvg))
-  .png()
-  .toFile(join(root, "app/apple-icon.png"));
+  const iconSizes = [
+    { file: "app/icon.png", size: 64 },
+    { file: "app/apple-icon.png", size: 180 },
+  ];
 
-console.log("Generated cover with photo:", PHOTO);
+  for (const { file, size } of iconSizes) {
+    const roundedMask = Buffer.from(`<?xml version="1.0" encoding="UTF-8"?>
+<svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+  <rect width="${size}" height="${size}" rx="${Math.round(size * 0.18)}" fill="#fff"/>
+</svg>`);
+
+    const photo = await sharp(face)
+      .resize(size, size)
+      .composite([{ input: roundedMask, blend: "dest-in" }])
+      .png()
+      .toBuffer();
+
+    await sharp({
+      create: {
+        width: size,
+        height: size,
+        channels: 4,
+        background: { r: 27, g: 27, b: 27, alpha: 1 },
+      },
+    })
+      .composite([
+        { input: photo, left: 0, top: 0 },
+        { input: ring(size), blend: "over" },
+      ])
+      .png()
+      .toFile(join(root, file));
+  }
+
+  // Evita conflicto con el favicon antiguo de iniciales.
+  const oldSvg = join(root, "app/icon.svg");
+  if (existsSync(oldSvg)) unlinkSync(oldSvg);
+}
+
+await makeOg();
+await makeFavicons();
+
+console.log("Generated with photo:", PHOTO);
 console.log("  public/images/social-thumbnail.jpg");
-console.log("  app/icon.svg");
+console.log("  app/opengraph-image.jpg");
+console.log("  app/twitter-image.jpg");
+console.log("  app/icon.png");
 console.log("  app/apple-icon.png");

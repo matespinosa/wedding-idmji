@@ -9,6 +9,7 @@ type Props = {
   title: string;
   description?: string;
   align?: "center" | "left";
+  centerEyebrow?: boolean;
   dark?: boolean;
   className?: string;
 };
@@ -19,6 +20,7 @@ export function SectionHeading({
   title,
   description,
   align = "center",
+  centerEyebrow = false,
   dark = false,
   className,
 }: Props) {
@@ -28,8 +30,8 @@ export function SectionHeading({
       <Reveal blur={false} y={16}>
         <p
           className={cn(
-            "flex items-center gap-4 text-[11px] font-medium uppercase tracking-[0.38em]",
-            centered && "justify-center",
+            "flex items-center gap-4 text-[12px] font-medium uppercase tracking-[0.34em]",
+            (centered || centerEyebrow) && "justify-center",
             dark ? "text-gold" : "text-bronze",
           )}
         >
@@ -55,9 +57,9 @@ export function SectionHeading({
         <Reveal delay={0.25} y={20}>
           <p
             className={cn(
-              "mt-6 text-[15px] leading-[1.85] md:text-base",
+              "mt-6 text-[18px] leading-[1.7] md:text-[19px]",
               centered && "mx-auto",
-              "max-w-md",
+              "max-w-lg",
               dark ? "text-cream/60" : "text-ink/60",
             )}
           >

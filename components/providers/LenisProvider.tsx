@@ -1,7 +1,8 @@
 "use client";
 
-import Lenis from "lenis";
+import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "lenis";
 import {
   createContext,
   useCallback,
@@ -11,8 +12,14 @@ import {
   type ReactNode,
 } from "react";
 
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+type ScrollOpts = { offset?: number; immediate?: boolean };
+
 type LenisApi = {
-  scrollTo: (target: string | number, opts?: { offset?: number }) => void;
+  scrollTo: (target: string | number, opts?: ScrollOpts) => void;
   stop: () => void;
   start: () => void;
 };
@@ -39,30 +46,35 @@ export function LenisProvider({ children }: { children: ReactNode }) {
     });
     lenisRef.current = lenis;
 
-    const syncScrollTrigger = () => ScrollTrigger.update();
-    lenis.on("scroll", syncScrollTrigger);
+    /* Sincroniza GSAP ScrollTrigger con el scroll suave de Lenis:
+       cada frame lo controla el ticker de GSAP y ScrollTrigger se
+       actualiza en cada evento de scroll de Lenis. */
+    lenis.on("scroll", ScrollTrigger.update);
 
-    let raf = 0;
-    const loop = (time: number) => {
-      lenis.raf(time);
-      raf = requestAnimationFrame(loop);
+    const onTick = (time: number) => {
+      lenis.raf(time * 1000);
     };
-    raf = requestAnimationFrame(loop);
+    gsap.ticker.add(onTick);
+    gsap.ticker.lagSmoothing(0);
 
     return () => {
-      cancelAnimationFrame(raf);
-      lenis.off("scroll", syncScrollTrigger);
+      lenis.off("scroll", ScrollTrigger.update);
+      gsap.ticker.remove(onTick);
       lenis.destroy();
       lenisRef.current = null;
     };
   }, []);
 
   const scrollTo = useCallback(
-    (target: string | number, opts?: { offset?: number }) => {
+    (target: string | number, opts?: ScrollOpts) => {
       const offset = opts?.offset ?? -64;
       const lenis = lenisRef.current;
       if (lenis) {
-        lenis.scrollTo(target, { offset, duration: 1.6 });
+        if (opts?.immediate) {
+          lenis.scrollTo(target, { offset, immediate: true, force: true });
+        } else {
+          lenis.scrollTo(target, { offset, duration: 1.6 });
+        }
       } else if (typeof target === "string") {
         document.querySelector(target)?.scrollIntoView();
       } else {

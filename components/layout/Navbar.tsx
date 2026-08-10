@@ -179,10 +179,10 @@ export function Navbar() {
                         onClick={(e) => go(e, link.href)}
                         className="group flex items-baseline gap-4 py-3"
                       >
-                        <span className="text-[11px] tracking-[0.3em] text-bronze">
+                        <span className="text-[13px] tracking-[0.26em] text-bronze">
                           0{i + 1}
                         </span>
-                        <span className="font-serif text-5xl font-light text-ink transition-colors duration-300 group-active:text-gold-deep">
+                        <span className="font-serif text-[3.4rem] font-light text-ink transition-colors duration-300 group-active:text-gold-deep">
                           {link.label}
                         </span>
                       </a>
@@ -199,10 +199,10 @@ export function Navbar() {
               transition={{ duration: 0.7, delay: 0.55 }}
               className="relative flex flex-col gap-2.5"
             >
-              <p className="font-serif text-xl italic text-ink/70">
+              <p className="font-serif text-2xl italic text-ink/70">
                 {site.couple.full}
               </p>
-              <p className="text-[10px] uppercase tracking-[0.25em] text-ink/40">
+              <p className="text-[12px] uppercase tracking-[0.22em] text-ink/50">
                 {site.date.short} · {site.date.city}
               </p>
             </motion.div>

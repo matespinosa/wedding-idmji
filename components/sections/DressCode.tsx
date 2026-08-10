@@ -6,30 +6,39 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { site } from "@/lib/content";
 import { draw } from "@/lib/motion";
 
-/* Ilustraciones originales de moda en línea continua. */
+/* ————————————————————————————————————————————————
+   Ilustraciones de moda en línea continua — dibujadas a mano
+   en SVG y trazadas con la animación `draw` al entrar en vista.
+   ———————————————————————————————————————————————— */
+
 const SUIT_PATHS = [
-  "M108,44 C96,45 90,50 76,56 C59,63 51,82 48,108 C45,138 50,178 57,210 L85,205 C81,170 79,146 81,126",
-  "M112,44 C124,45 130,50 144,56 C161,63 169,82 172,108 C175,138 170,178 163,210 L135,205 C139,170 141,146 139,126",
-  "M81,126 C83,172 85,216 89,258 L131,258 C135,216 137,172 139,126",
-  "M107,46 C99,68 95,96 97,122 M97,122 L110,99",
-  "M113,46 C121,68 125,96 123,122 M123,122 L110,99",
-  "M96,52 L110,82 L124,52",
-  "M110,82 L105,92 L107,146 L110,155 L113,146 L115,92 Z",
-  "M88,118 L103,115 L97,106 Z",
-  "M115,172 a2.2,2.2 0 1,0 0.1,0",
-  "M115,194 a2.2,2.2 0 1,0 0.1,0",
-  "M89,258 C90,286 92,304 94,318 M131,258 C130,286 128,304 126,318 M110,262 L110,318",
+  // Un solo contorno une cuello, hombros, mangas y cuerpo del saco.
+  "M102,48 L92,56 L50,68 C41,71 37,80 35,96 C30,140 30,205 31,248 L34,292 L63,292 L72,141 C72,190 73,245 76,292 C88,300 100,299 110,289 C120,299 132,300 144,292 C147,245 148,190 148,141 L157,292 L186,292 L189,248 C190,205 190,140 185,96 C183,80 179,71 170,68 L128,56 L118,48 C112,44 108,44 102,48 Z",
+  // Dos puntas de camisa amplias dejan libre el centro del cuello.
+  "M92,56 L102,48 L109,63 L99,77 Z M128,56 L118,48 L111,63 L121,77 Z",
+  // El nudo conecta ambas puntas y comparte su base con la hoja de la corbata.
+  "M109,63 L106,72 L108,82 L112,82 L114,72 L111,63 Z M108,82 L108,141 L110,152 L112,141 L112,82",
+  // Solapas ancladas a los hombros; se unen al frente y a la abertura central.
+  "M92,56 L82,89 L88,98 L110,188 L132,98 L138,89 L128,56 M110,188 L110,289",
 ];
 
 const GOWN_PATHS = [
+  // tirantes
   "M92,42 C92,54 88,64 84,74 M128,42 C128,54 132,64 136,74",
+  // escote
   "M84,74 C96,87 124,87 136,74",
+  // corpiño
   "M84,74 C80,98 82,120 88,138 M136,74 C140,98 138,120 132,138",
+  // costura de cintura
   "M88,138 C102,145 118,145 132,138",
+  // caída izquierda de la falda
   "M88,138 C68,196 50,248 42,300 C74,313 92,315 110,315",
+  // caída derecha
   "M132,138 C152,196 170,248 178,300 C146,313 128,315 110,315",
+  // pliegues
   "M102,146 C94,208 84,258 78,306",
   "M118,146 C126,208 136,258 142,306",
+  // destello
   "M62,108 l0,10 M57,113 l10,0",
 ];
 
@@ -57,14 +66,8 @@ function FashionPlate({ paths, label }: { paths: string[]; label: string }) {
         viewport={{ once: true, amount: 0.45 }}
         className="relative h-72 text-gold md:h-80"
       >
-        {paths.map((d, index) => (
-          <motion.path
-            key={d}
-            d={d}
-            strokeWidth={1.6}
-            variants={draw(1.7)}
-            custom={index}
-          />
+        {paths.map((d, i) => (
+          <motion.path key={i} d={d} strokeWidth={1.6} variants={draw(1.7)} custom={i} />
         ))}
       </motion.svg>
     </motion.div>
@@ -74,6 +77,8 @@ function FashionPlate({ paths, label }: { paths: string[]; label: string }) {
 type Group = {
   label: string;
   garment: string;
+  /** Matices opcionales bajo la prenda; aquí la etiqueta habla sola. */
+  notes?: readonly string[];
 };
 
 function CodeColumn({
@@ -86,18 +91,25 @@ function CodeColumn({
   delay: number;
 }) {
   return (
-    <article className="flex flex-col items-center text-center">
-      <FashionPlate paths={paths} label={`Ilustración de ${group.garment}`} />
+    <div className="flex flex-col items-center text-center">
+      <FashionPlate paths={paths} label={`Ilustración: ${group.garment}`} />
 
       <Reveal delay={delay} y={24}>
-        <p className="mt-10 text-[11px] font-medium uppercase tracking-[0.4em] text-gold">
+        <p className="mt-10 text-[12px] font-medium uppercase tracking-[0.36em] text-gold">
           {group.label}
         </p>
-        <h3 className="mt-3 font-serif text-3xl font-light italic text-cream md:text-4xl">
+        <h3 className="mt-3 font-serif text-[2.2rem] font-light italic text-cream md:text-[2.9rem]">
           {group.garment}
         </h3>
+        {group.notes && group.notes.length > 0 && (
+          <ul className="mt-5 space-y-1.5 text-[18px] leading-relaxed text-cream/65">
+            {group.notes.map((note) => (
+              <li key={note}>{note}</li>
+            ))}
+          </ul>
+        )}
       </Reveal>
-    </article>
+    </div>
   );
 }
 
@@ -105,11 +117,17 @@ export function DressCode() {
   return (
     <section
       id="dress-code"
-      className="relative overflow-hidden bg-ink py-28 text-cream md:py-36"
+      className="relative overflow-hidden bg-ink pt-28 pb-32 text-cream md:py-36"
     >
+      {/* Viñeta ambiental dorada. El centro va a un 32% del alto (no al
+          8%) para que la mancha se apague del todo antes de tocar el
+          borde superior: si toca el borde, se corta en una línea recta
+          justo donde termina la onda del divisor, y esa costura recta
+          es lo que se leía como "cortado". Así el brillo nace ya
+          dentro de la sección, disolviéndose en el ink que trae la onda. */}
       <div
         aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(55%_45%_at_50%_8%,rgba(198,169,122,0.12),transparent_70%)]"
+        className="absolute inset-0 bg-[radial-gradient(60%_42%_at_50%_32%,rgba(198,169,122,0.14),transparent_65%)]"
       />
 
       <div className="relative mx-auto max-w-5xl px-5 md:px-8">
@@ -126,7 +144,7 @@ export function DressCode() {
         </div>
 
         <Reveal delay={0.2} y={18}>
-          <p className="mx-auto mt-20 flex max-w-md items-center justify-center gap-4 text-center font-serif text-lg italic text-cream/70">
+          <p className="mx-auto mt-20 flex max-w-lg items-center justify-center gap-4 text-center font-serif text-xl italic text-cream/75 md:text-2xl">
             <span aria-hidden className="h-px w-8 shrink-0 bg-gold/40" />
             {site.dresscode.note}
             <span aria-hidden className="h-px w-8 shrink-0 bg-gold/40" />
