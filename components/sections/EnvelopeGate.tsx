@@ -76,6 +76,15 @@ const GEO: Record<Variant, EnvelopeCfg> = {
 const LAYER = "pointer-events-none fixed inset-0 [perspective:1700px]";
 const CENTER = "absolute inset-0 grid place-items-center";
 
+/* El marcado del servidor se pinta antes de hidratar, y ahí el sobre es
+   siempre apaisado y la página todavía no está recortada dentro del hueco:
+   en un móvil lento eso se ve como un sobre deformado con la foto asomando.
+   Las tres capas nacen invisibles y las revela el cliente, ya con formato y
+   geometría resueltos; mientras tanto solo se ve el fondo crema.
+   El valor no cambia entre renders a propósito, así React no le pisa a GSAP
+   la opacidad que anima. */
+const HIDDEN = { opacity: 0 } as const;
+
 type Geo = {
   x: number;
   y: number;
@@ -373,8 +382,19 @@ export function EnvelopeGate({
       render();
     });
 
+    const layers = [
+      backLayerRef.current,
+      stageLayerRef.current,
+      frontLayerRef.current,
+    ];
+
     const ctx = gsap.context(() => {
-      if (reduced) return;
+      /* Sin animación de entrada no hay quien revele las capas, que nacen
+         invisibles para no enseñar el marcado del servidor. */
+      if (reduced) {
+        gsap.set(layers, { opacity: 1 });
+        return;
+      }
 
       /* El sobre y la página se mueven como una sola pieza: el mismo
          desplazamiento y escala se aplican a las tres capas. */
@@ -396,11 +416,7 @@ export function EnvelopeGate({
       applyMotion();
 
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
-      tl.fromTo(
-        [backLayerRef.current, stageLayerRef.current, frontLayerRef.current],
-        { opacity: 0 },
-        { opacity: 1, duration: 0.7 },
-      )
+      tl.fromTo(layers, { opacity: 0 }, { opacity: 1, duration: 0.7 })
         .to(
           motion,
           { off: 0, os: 1, rx: 0, duration: 1.4, onUpdate: applyMotion },
@@ -561,7 +577,7 @@ export function EnvelopeGate({
           </div>
 
           {/* Capa trasera: el papel del sobre por detrás de la página */}
-          <div ref={backLayerRef} className={`${LAYER} z-[81]`}>
+          <div ref={backLayerRef} className={`${LAYER} z-[81]`} style={HIDDEN}>
             <div className={CENTER}>
               <div ref={backBoxRef} className={cfg.box}>
                 {!portrait && (
@@ -595,6 +611,7 @@ export function EnvelopeGate({
       <div
         ref={stageLayerRef}
         className={gone ? undefined : "fixed inset-0 z-[82] [perspective:1700px]"}
+        style={gone ? undefined : HIDDEN}
       >
         <div ref={stageWrapRef} className={gone ? undefined : "absolute inset-0"}>
           <div
@@ -610,7 +627,7 @@ export function EnvelopeGate({
 
       {!gone && (
         /* Capa delantera: cuerpo del sobre, solapa y lacre — tapa la página */
-        <div ref={frontLayerRef} className={`${LAYER} z-[83]`}>
+        <div ref={frontLayerRef} className={`${LAYER} z-[83]`} style={HIDDEN}>
           <div className={CENTER}>
             <div
               ref={frontBoxRef}
