@@ -51,11 +51,22 @@ async function makeOg() {
   const outOg = join(root, "app/opengraph-image.jpg");
   const outTw = join(root, "app/twitter-image.jpg");
 
+  /* `attention` centraba el recorte en el techo y las luces (más
+     contraste que la pareja), dejando una franja crema arriba que en
+     miniatura se lee como un borde. Recortamos a mano, centrado en
+     ellos, antes de escalar. */
+  const src = await sharp(photoPath).rotate().metadata();
+  const srcW = src.width ?? 1704;
+  const srcH = src.height ?? 1800;
+  const cropH = Math.round(srcW / (W / H));
+  const top = Math.min(srcH - cropH, Math.round(srcH * 0.265));
+
   const buffer = await sharp(photoPath)
     .rotate()
-    .resize(W, H, { fit: "cover", position: "attention" })
+    .extract({ left: 0, top, width: srcW, height: cropH })
+    .resize(W, H, { fit: "cover" })
     .composite([{ input: overlay, blend: "over" }])
-    .jpeg({ quality: 90, mozjpeg: true })
+    .jpeg({ quality: 94, mozjpeg: true })
     .toBuffer();
 
   await sharp(buffer).toFile(outPublic);

@@ -26,8 +26,7 @@ const alexBrush = Alex_Brush({
 });
 
 export const metadata: Metadata = {
-  // TODO: cambia esto por el dominio real cuando se publique.
-  metadataBase: new URL("https://mateo-julieth.vercel.app"),
+  metadataBase: new URL("https://mateoyjulieth.vercel.app"),
   title: "Mateo & Julieth — Ceremonia religiosa · 03.10.2026",
   description:
     "Acompáñanos en nuestra ceremonia religiosa el sábado 3 de octubre de 2026 en la Iglesia de Dios Ministerial de Jesucristo Internacional, sede La Colina, Bogotá.",
