@@ -18,27 +18,6 @@ const photoPath = join(root, "public/images", PHOTO);
 const W = 1200;
 const H = 630;
 
-const overlay = Buffer.from(`<?xml version="1.0" encoding="UTF-8"?>
-<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="veil" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#1b1b1b" stop-opacity="0.05"/>
-      <stop offset="45%" stop-color="#1b1b1b" stop-opacity="0.15"/>
-      <stop offset="100%" stop-color="#1b1b1b" stop-opacity="0.72"/>
-    </linearGradient>
-  </defs>
-  <rect width="${W}" height="${H}" fill="url(#veil)"/>
-  <text x="600" y="470" text-anchor="middle"
-    font-family="Georgia, 'Times New Roman', serif" font-size="18" letter-spacing="7"
-    fill="#f7f3ee" fill-opacity="0.9">CEREMONIA RELIGIOSA</text>
-  <text x="600" y="535" text-anchor="middle"
-    font-family="Georgia, 'Times New Roman', serif" font-size="64" font-style="italic"
-    fill="#f7f3ee">Mateo &amp; Julieth</text>
-  <text x="600" y="580" text-anchor="middle"
-    font-family="Georgia, 'Times New Roman', serif" font-size="20" letter-spacing="5"
-    fill="#c6a97a">03 · 10 · 2026 · BOGOTÁ</text>
-</svg>`);
-
 const ring = (size) =>
   Buffer.from(`<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
@@ -65,7 +44,6 @@ async function makeOg() {
     .rotate()
     .extract({ left: 0, top, width: srcW, height: cropH })
     .resize(W, H, { fit: "cover" })
-    .composite([{ input: overlay, blend: "over" }])
     .jpeg({ quality: 94, mozjpeg: true })
     .toBuffer();
 
