@@ -197,7 +197,6 @@ export function Gallery() {
           dark
           eyebrow={site.gallery.eyebrow}
           title={site.gallery.title}
-          description={site.gallery.intro}
         />
       </div>
 
