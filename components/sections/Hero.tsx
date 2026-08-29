@@ -87,6 +87,7 @@ export function Hero() {
   });
 
   const onMouseMove = (e: React.MouseEvent) => {
+    if (window.matchMedia("(pointer: coarse)").matches) return;
     mx.set(e.clientX / window.innerWidth - 0.5);
     my.set(e.clientY / window.innerHeight - 0.5);
   };
@@ -98,8 +99,10 @@ export function Hero() {
       onMouseMove={onMouseMove}
       className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden bg-cream"
     >
-      {/* Ambiente: manchas de luz en deriva lenta */}
-      <div aria-hidden className="absolute inset-0">
+      {/* Ambiente: manchas de luz en deriva lenta.
+          El blur-3xl en orbes de 40rem es carísimo en iOS; en móvil el
+          crema plano ya da el tono y nos ahorramos el filtro. */}
+      <div aria-hidden className="absolute inset-0 hidden md:block">
         <div className="animate-drift absolute -left-40 -top-48 size-[42rem] rounded-full bg-gold/[0.12] blur-3xl" />
         <div className="animate-drift-slow absolute -bottom-56 -right-32 size-[46rem] rounded-full bg-sand/50 blur-3xl" />
         <div className="animate-drift absolute left-1/3 top-1/2 size-[30rem] rounded-full bg-white/60 blur-3xl [animation-delay:-12s]" />
@@ -119,7 +122,7 @@ export function Hero() {
         {DUST.map((p, i) => (
           <span
             key={i}
-            className="animate-float absolute rounded-full bg-gold"
+            className={`animate-float absolute rounded-full bg-gold${i >= 6 ? " max-md:hidden" : ""}`}
             style={{
               left: `${p.left}%`,
               top: `${p.top}%`,
@@ -214,7 +217,7 @@ export function Hero() {
                     alt="Mateo y Julieth"
                     fill
                     priority
-                    sizes="(max-width: 768px) 86vw, 390px"
+                    sizes="(max-width: 768px) 70vw, 390px"
                     className="object-cover object-[50%_32%]"
                   />
                 </span>

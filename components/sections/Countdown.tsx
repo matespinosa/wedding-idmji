@@ -52,7 +52,7 @@ export function Countdown() {
     <section className="relative overflow-hidden bg-cream py-24 md:py-32">
       <div
         aria-hidden
-        className="animate-drift-slow absolute left-1/2 top-1/2 size-[40rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/[0.06] blur-3xl"
+        className="animate-drift-slow absolute left-1/2 top-1/2 hidden size-[40rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold/[0.06] blur-3xl md:block"
       />
 
       <div className="relative mx-auto max-w-4xl px-5 text-center md:px-8">

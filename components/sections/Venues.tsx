@@ -130,7 +130,7 @@ export function Venues() {
     >
       <div
         aria-hidden
-        className="animate-drift-slow absolute -left-40 top-1/3 size-[36rem] rounded-full bg-gold/[0.07] blur-3xl"
+        className="animate-drift-slow absolute -left-40 top-1/3 hidden size-[36rem] rounded-full bg-gold/[0.07] blur-3xl md:block"
       />
 
       <div className="relative mx-auto max-w-5xl px-5 md:px-8">

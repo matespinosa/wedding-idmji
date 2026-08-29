@@ -15,9 +15,9 @@ const prefersReducedMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ————————————————————————————————————————————————
-   Parallax con GSAP + ScrollTrigger (scrub). El elemento interior
-   se desplaza en el eje Y mientras su contenedor cruza el viewport.
-   Pensado sobre todo para móvil, donde el efecto se siente más.
+   Parallax con GSAP + ScrollTrigger (scrub). En puntero fino (ratón)
+   el desplazamiento vertical se siente; en táctil se omite porque
+   recomponer la foto en cada frame de scroll deja el iPhone trabado.
    ———————————————————————————————————————————————— */
 
 type ParallaxImageProps = {
@@ -49,6 +49,9 @@ export function ParallaxImage({
 
   useEffect(() => {
     if (prefersReducedMotion()) return;
+    /* En táctil el transform dentro de overflow-hidden recompone la foto
+       en cada frame de scroll; el nativo se siente más ligero sin él. */
+    if (window.matchMedia("(pointer: coarse)").matches) return;
     const wrap = wrapRef.current;
     const layer = layerRef.current;
     if (!wrap || !layer) return;
@@ -105,6 +108,7 @@ export function useParallax<T extends HTMLElement = HTMLDivElement>(
   useEffect(() => {
     if (prefersReducedMotion()) return;
     if (mobileOnly && window.matchMedia("(min-width: 768px)").matches) return;
+    if (window.matchMedia("(pointer: coarse)").matches) return;
     const el = ref.current;
     if (!el) return;
 
@@ -152,6 +156,7 @@ export function Parallax({
   useEffect(() => {
     if (prefersReducedMotion()) return;
     if (mobileOnly && window.matchMedia("(min-width: 768px)").matches) return;
+    if (window.matchMedia("(pointer: coarse)").matches) return;
     const el = ref.current;
     if (!el) return;
 

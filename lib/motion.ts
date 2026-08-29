@@ -31,13 +31,12 @@ export const springSnappy = {
   mass: 0.6,
 } as const;
 
-/** Rise + de-blur. The signature reveal of the site. */
+/** Rise + fade. The signature reveal of the site. */
 export const fadeUp = (delay = 0, y = 30): Variants => ({
-  hidden: { opacity: 0, y, filter: "blur(10px)" },
+  hidden: { opacity: 0, y },
   show: {
     opacity: 1,
     y: 0,
-    filter: "blur(0px)",
     transition: { duration: DUR.base, ease: EASE_OUT, delay },
   },
 });

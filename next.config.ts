@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     /* Las fotos no cambian nunca: un año de caché en el CDN en vez de 60s. */
     minimumCacheTTL: 31536000,
+    /* Sin tamaños 2K/4K: el arco del hero y el álbum nunca se muestran
+       a esa resolución y generarlos solo alarga el decode en el móvil. */
+    deviceSizes: [640, 750, 828, 1080, 1200],
+    imageSizes: [96, 128, 256, 384],
   },
 };
 

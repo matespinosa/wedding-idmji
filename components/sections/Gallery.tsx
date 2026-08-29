@@ -188,7 +188,7 @@ export function Gallery() {
       />
       <div
         aria-hidden
-        className="animate-drift-slow pointer-events-none absolute -right-32 top-24 size-[34rem] rounded-full bg-gold/[0.07] blur-3xl"
+        className="animate-drift-slow pointer-events-none absolute -right-32 top-24 hidden size-[34rem] rounded-full bg-gold/[0.07] blur-3xl md:block"
       />
       <FloralBranch className="pointer-events-none absolute -left-10 top-16 h-44 rotate-12 text-gold/[0.14]" />
 
@@ -271,7 +271,7 @@ export function Gallery() {
                     src={page.photo.src}
                     alt={page.photo.alt}
                     placeholder="blur"
-                    sizes="(max-width: 768px) 80vw, 32vw"
+                    sizes="(max-width: 768px) 55vw, 20rem"
                     className="h-full w-auto max-w-none object-cover transition-transform duration-[1500ms] ease-out-expo group-hover:scale-[1.04]"
                   />
                   <span

@@ -2,10 +2,18 @@
 
 import { createContext, useContext } from "react";
 
-/**
- * `true` once the entry preloader has lifted — the hero waits for this
- * signal so its title animation lands exactly as the curtain reveals it.
- */
-export const LoadContext = createContext(false);
+type LoadState = {
+  /** The invitation is sliding out of the envelope — hero animations start. */
+  ready: boolean;
+  /** The envelope is gone and the page is a normal document. */
+  settled: boolean;
+};
 
-export const useSiteReady = () => useContext(LoadContext);
+export const LoadContext = createContext<LoadState>({
+  ready: false,
+  settled: false,
+});
+
+export const useSiteReady = () => useContext(LoadContext).ready;
+
+export const useSiteSettled = () => useContext(LoadContext).settled;

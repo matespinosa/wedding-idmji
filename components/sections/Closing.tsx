@@ -74,7 +74,7 @@ export function Closing() {
         {PARTICLES.map((p, i) => (
           <span
             key={i}
-            className="animate-float absolute rounded-full bg-gold"
+            className={`animate-float absolute rounded-full bg-gold${i >= 8 ? " max-md:hidden" : ""}`}
             style={{
               left: `${p.left}%`,
               top: `${p.top}%`,

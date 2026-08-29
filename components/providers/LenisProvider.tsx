@@ -36,7 +36,14 @@ export function LenisProvider({ children }: { children: ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    ScrollTrigger.config({ ignoreMobileResize: true });
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    /* En táctil el scroll nativo (momentum de iOS) es más fluido que Lenis:
+       el ticker a 60fps + lagSmoothing(0) era lo que dejaba el sitio pesado
+       al bajar después de abrir el sobre. */
+    const desktop = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (reduced || !desktop) return;
 
     const lenis = new Lenis({
       duration: 1.15,
@@ -60,6 +67,7 @@ export function LenisProvider({ children }: { children: ReactNode }) {
     return () => {
       lenis.off("scroll", ScrollTrigger.update);
       gsap.ticker.remove(onTick);
+      gsap.ticker.lagSmoothing(500);
       lenis.destroy();
       lenisRef.current = null;
     };

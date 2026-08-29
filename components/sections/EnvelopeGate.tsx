@@ -97,10 +97,13 @@ type Geo = {
 
 export function EnvelopeGate({
   onOpen,
+  onSettled,
   children,
 }: {
   /** Se dispara cuando la página empieza a salir del sobre. */
   onOpen: () => void;
+  /** Se dispara cuando la animación terminó y el scroll ya es el del sitio. */
+  onSettled?: () => void;
   children: ReactNode;
 }) {
   const { stop, start, scrollTo } = useLenis();
@@ -135,6 +138,9 @@ export function EnvelopeGate({
   const idleRef = useRef<gsap.core.Tween[]>([]);
   const onOpenRef = useRef(onOpen);
   onOpenRef.current = onOpen;
+  const onSettledRef = useRef(onSettled);
+  onSettledRef.current = onSettled;
+  const cheapFx = useRef(false);
 
   /* ——— Geometría: dónde y con qué escala vive la página dentro del sobre.
      Se calcula sin leer transforms (offsetWidth + centrado), así que es
@@ -194,10 +200,13 @@ export function EnvelopeGate({
     const scale = g.s + (1 - g.s) * p;
 
     stage.style.transformOrigin = "0 0";
-    stage.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+    stage.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
     stage.style.clipPath = `inset(${g.insetY * e}px ${g.insetX * e}px ${
       g.insetY * e
     }px ${g.insetX * e}px round ${g.radius * e}px)`;
+    /* GPU layer while the letter is still a card; drop it once expanded so
+       the browser does not keep a giant composited snapshot around. */
+    stage.style.willChange = p < 1 ? "transform" : "";
   }, []);
 
   /* ——— Solapa: giro + sombra proyectada.
@@ -212,12 +221,14 @@ export function EnvelopeGate({
     const flap = flapRef.current;
     if (flap) {
       flap.style.transform = `rotateX(${deg}deg)`;
-      /* Sombra de contacto: sigue el filo en uve del recorte y se
-         despega del papel a medida que la solapa se levanta. */
-      const contact = 1 - Math.min(1, t * 3);
-      flap.style.filter = `drop-shadow(0 ${4 + 5 * lift}px ${
-        5 + 9 * lift
-      }px rgba(88, 66, 38, ${0.3 * contact + 0.12 * lift}))`;
+      /* Sombra de contacto: en táctil el `drop-shadow` rasteriza la
+         solapa entera cada frame; el volumen ya lo da la sombra proyectada. */
+      if (!cheapFx.current) {
+        const contact = 1 - Math.min(1, t * 3);
+        flap.style.filter = `drop-shadow(0 ${4 + 5 * lift}px ${
+          5 + 9 * lift
+        }px rgba(88, 66, 38, ${0.3 * contact + 0.12 * lift}))`;
+      }
     }
 
     /* Sombra proyectada sobre el cuerpo: nace en el pliegue, se difumina
@@ -225,7 +236,9 @@ export function EnvelopeGate({
     const shadow = flapShadowRef.current;
     if (shadow) {
       shadow.style.opacity = String(0.38 * lift);
-      shadow.style.filter = `blur(${10 + 22 * lift}px)`;
+      if (!cheapFx.current) {
+        shadow.style.filter = `blur(${10 + 22 * lift}px)`;
+      }
     }
     const shadowInner = flapShadowInnerRef.current;
     if (shadowInner) shadowInner.style.transform = `scaleY(${1 - 0.6 * t})`;
@@ -237,6 +250,7 @@ export function EnvelopeGate({
 
   /* Formato según viewport, resuelto antes del primer pintado. */
   useLayoutEffect(() => {
+    cheapFx.current = window.matchMedia("(pointer: coarse)").matches;
     const media = window.matchMedia("(min-width: 768px)");
     const apply = () => {
       const next: Variant = media.matches ? "landscape" : "portrait";
@@ -288,6 +302,7 @@ export function EnvelopeGate({
         window.scrollTo(0, 0);
         scrollTo(0, { offset: 0, immediate: true });
         start();
+        onSettledRef.current?.();
       },
     });
 
@@ -304,7 +319,7 @@ export function EnvelopeGate({
         opacity: 0,
         y: -46,
         rotate: -34,
-        filter: "blur(5px)",
+        filter: cheapFx.current ? "none" : "blur(5px)",
         duration: 0.55 * k,
         ease: "power3.in",
       })
@@ -353,6 +368,7 @@ export function EnvelopeGate({
   /* ——— Bloqueo de scroll + entrada del sobre ——— */
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    cheapFx.current = window.matchMedia("(pointer: coarse)").matches;
 
     /* Un refresco a media página no debe dejar el sitio desplazado. */
     if ("scrollRestoration" in history) history.scrollRestoration = "manual";
@@ -398,19 +414,22 @@ export function EnvelopeGate({
 
       /* El sobre y la página se mueven como una sola pieza: el mismo
          desplazamiento y escala se aplican a las tres capas. */
-      const motion = { off: 44, os: 0.9, rx: 16 };
+      const motion = { off: 44, os: 0.9, rx: cheapFx.current ? 0 : 16 };
       const boxes = [
         backBoxRef.current,
         frontBoxRef.current,
         stageWrapRef.current,
       ];
       /* Cuerpo con llaves a propósito: `gsap.set` devuelve un Tween y
-         `onUpdate` espera un callback que no retorne nada. */
+         `onUpdate` espera un callback que no retorne nada.
+         force3D mantiene la capa en GPU; en táctil no inclinamos en X
+         (compositor 3D + clip-path de la página es lo que trababa el iPhone). */
       const applyMotion = () => {
         gsap.set(boxes, {
           y: motion.off,
           scale: motion.os,
           rotateX: motion.rx,
+          force3D: true,
         });
       };
       applyMotion();
@@ -431,7 +450,10 @@ export function EnvelopeGate({
         )
         .from(hintRef.current, { opacity: 0, y: 14, duration: 0.8 }, "-=0.4")
         .add(() => {
-          /* Vida en reposo: el sobre flota y la pista respira */
+          /* Vida en reposo: solo flota en Y. Inclinar o escalar en bucle
+             recompone la página recortada cada frame. */
+          motion.os = 1;
+          motion.rx = 0;
           idleRef.current.push(
             gsap.to(motion, {
               off: -12,
@@ -563,8 +585,8 @@ export function EnvelopeGate({
             className="fixed inset-0 z-[80] touch-none select-none overscroll-none bg-cream"
           >
             <div aria-hidden className="absolute inset-0 overflow-hidden">
-              <div className="animate-drift absolute -left-40 -top-40 size-[40rem] rounded-full bg-gold/[0.14] blur-3xl" />
-              <div className="animate-drift-slow absolute -bottom-48 -right-32 size-[44rem] rounded-full bg-sand/60 blur-3xl" />
+              <div className="animate-drift absolute -left-40 -top-40 hidden size-[40rem] rounded-full bg-gold/[0.14] blur-3xl md:block" />
+              <div className="animate-drift-slow absolute -bottom-48 -right-32 hidden size-[44rem] rounded-full bg-sand/60 blur-3xl md:block" />
 
               {/* Botánica de encuadre — solo dos esquinas, bien suaves */}
               <div className="hidden md:block">
@@ -617,7 +639,9 @@ export function EnvelopeGate({
           <div
             ref={stageRef}
             className={
-              gone ? undefined : "absolute left-0 top-0 h-full w-full overflow-hidden"
+              gone
+                ? undefined
+                : "absolute left-0 top-0 h-full w-full overflow-hidden contain-paint"
             }
           >
             {children}
