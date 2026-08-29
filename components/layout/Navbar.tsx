@@ -74,7 +74,7 @@ export function Navbar() {
         className={cn(
           "fixed inset-x-0 top-0 z-50 transition-all duration-500",
           scrolled && !open
-            ? "border-b border-ink/[0.06] bg-cream/80 backdrop-blur-xl"
+            ? "border-b border-ink/[0.06] bg-cream/95 md:bg-cream/80 md:backdrop-blur-xl"
             : "border-b border-transparent bg-transparent",
         )}
       >

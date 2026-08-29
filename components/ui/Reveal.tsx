@@ -9,20 +9,20 @@ type Props = {
   className?: string;
   delay?: number;
   y?: number;
-  /** Blur-in costs a little paint — disable for large surfaces. */
+  /** Blur-in forces a filter paint on every frame — off by default. */
   blur?: boolean;
   amount?: number;
   once?: boolean;
   duration?: number;
 };
 
-/** The house scroll-reveal: rise, fade and de-blur on a long expo curve. */
+/** The house scroll-reveal: rise and fade on a long expo curve. */
 export function Reveal({
   children,
   className,
   delay = 0,
   y = 30,
-  blur = true,
+  blur = false,
   amount = 0.3,
   once = true,
   duration = DUR.base,
